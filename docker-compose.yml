@@ -1,0 +1,52 @@
+version: '3.9'
+services:
+  mysql1:
+    image: mysql:5.7
+    platform: linux/amd64
+    restart: always
+    container_name: a4db
+    environment:
+    - MYSQL_ROOT_PASSWORD=admin
+    ports:
+    - '3310:3310'
+    volumes:
+    - '.\Nodejs\db:/var/lib/mysql'
+    stdin_open: true
+    tty: true
+  app:
+    image: node:latest
+    container_name: A4nodejs
+    environment:
+      DB_HOST: mysql1
+      DB_PORT: 3310
+      DB_USER: root
+      DB_PASSWORD: admin
+    ports:
+    - "8080:8080"
+    command: ["bin/bash"]
+    volumes:
+    - .\Nodejs:/code
+    depends_on:
+    - mysql1 
+    stdin_open: true
+    tty: true
+  reactapp:
+    image: node:latest
+    container_name: A4react
+    environment:
+      DB_HOST: mysql1
+      DB_PORT: 3310
+      DB_USER: root
+      DB_PASSWORD: admin
+    ports:
+    - "3000:3000"
+    command: ["bin/bash"]
+    volumes:
+    - .\Reactjs\react-frontend:/code
+    depends_on:
+    - mysql1 
+    stdin_open: true
+    tty: true
+volumes: 
+  db:
+    driver: local
